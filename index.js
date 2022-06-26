@@ -3,6 +3,7 @@
 const { Client } = require("@notionhq/client");
 const dotenv = require("dotenv");
 const fs = require("node:fs");
+const path = require("path");
 const handlebars = require("handlebars");
 const puppeteer = require("puppeteer-core")
 const { NotionBlocksHtmlParser } = require("@notion-stuff/blocks-html-parser");
@@ -175,7 +176,7 @@ class RecipesNotionHtmlToDoc {
 	recipes = await converter.addContentToRecipes(recipes, 10);
 
 	// Convert recipes to html then pdf
-	const doc = args[0] ? args[0] : "recipes"
+	const doc = path.resolve(process.cwd(), args[0] ? args[0] : "./recipes");
 	await converter.getBook(recipes, `${doc}.html`);
 	await converter.printPDF(`file://${doc}.html`, `${doc}.pdf`);
 })();
