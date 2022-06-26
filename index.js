@@ -34,7 +34,7 @@ class RecipesNotionHtmlToDoc {
 			// Register helpers
 			handlebars.registerHelper('firstLetter', (str) => str.substring(0, 1));
 			handlebars.registerHelper('minutesToDuration', (mins) => `${mins < 60 ? "" : Math.trunc(mins / 60) + " h "}${(mins % 60) === 0 ? "" : ((mins < 60 ? "" : "0") + mins % 60).slice(-2) + " min"}`);
-			handlebars.registerHelper('hoursToDuration', (hrs) => `${hrs < 1 ? "" : Math.trunc(hrs) + " h "}${hrs - Math.trunc(hrs) === 0 ? "" : ((hrs < 1 ? "" : "0") + Math.trunc(hrs * 60)).slice(-2) + " min"}`);
+			handlebars.registerHelper('hoursToDuration', (hrs) => `${hrs < 1 ? "" : Math.trunc(hrs) + " h "}${hrs - Math.trunc(hrs) === 0 ? "" : ((hrs < 1 ? "" : "0") + Math.trunc((hrs - Math.floor(hrs)) * 60)).slice(-2) + " min"}`);
 			console.info("Template loaded");
 		});
 

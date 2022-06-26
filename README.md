@@ -55,5 +55,5 @@ npm run start /tmp/recipes
 
 The PDF `/tmp/recipes.pdf` is then generated and ready to be printed.
 
-**Warning** Some CSS parts are not well managed by pagedjs with Chrome/Chromium (the process stop a first block in error).
+**Warning** Some CSS parts are not well managed by pagedjs with Chrome/Chromium (the process stop on first block in error).
 In this case, open html file in Firefox and generate PDF in browser.

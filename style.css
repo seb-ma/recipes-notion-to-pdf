@@ -96,7 +96,7 @@ h1.recipe {
 }
 
 .presentation {
-	margin-top: 1rem;
+	margin-bottom: 1rem;
 }
 
 .recipe img.cover {
@@ -116,7 +116,6 @@ span.mdi {
 
 .recipe .content {
 	column-count: 2;
-	margin-top: 1rem;
 }
 
 .recipe .content h2 {
