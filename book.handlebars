@@ -23,6 +23,23 @@
 
 	<!-- CSS from style.css -->
 	{{&cssBook}}
+
+	<script>
+		// Checked by Puppeteer
+		window.fullRender = false;
+		// Called by pagedjs
+		class MyHandler extends Paged.Handler {
+			constructor(chunker, polisher, caller) {
+				super(chunker, polisher, caller);
+			}
+
+			afterRendered(pages) {
+				console.info("End of pagedjs rendering");
+				window.fullRender = true;
+			};
+		}
+		Paged.registerHandlers(MyHandler);
+	</script>
 </head>
 
 <body>

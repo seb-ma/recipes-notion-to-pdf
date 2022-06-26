@@ -18,6 +18,7 @@
 		"@notionhq/client": "latest",
 		"@notion-stuff/blocks-html-parser": "latest",
 		"marked": "latest",
-		"highlight.js": "latest"
+		"highlight.js": "latest",
+		"puppeteer-core": "latest"
 	}
 }

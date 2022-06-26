@@ -4,7 +4,7 @@ const { Client } = require("@notionhq/client");
 const dotenv = require("dotenv");
 const fs = require("node:fs");
 const handlebars = require("handlebars");
-
+const puppeteer = require("puppeteer-core")
 const { NotionBlocksHtmlParser } = require("@notion-stuff/blocks-html-parser");
 
 class RecipesNotionHtmlToDoc {
@@ -140,6 +140,28 @@ class RecipesNotionHtmlToDoc {
 		}
 		return htmlBook;
 	}
+
+	async printPDF(doc, file) {
+		const browser = await puppeteer.launch({ headless: true, executablePath: "chromium" });
+		const page = await browser.newPage();
+		console.info(`Open ${doc} in browser`);
+		await page.goto(doc, { waitUntil: 'networkidle0' });
+		console.info(`Wait full rendering`);
+		await page.waitForFunction("window.fullRender === true", { timeout: 5 * 60 * 1000 });
+
+		console.info(`Generate pdf`);
+		const pdf = await page.pdf({ format: 'A4' });
+		await browser.close();
+		if (file) {
+			fs.writeFile(file, pdf, function (error) {
+				if (error) {
+					throw (error);
+				}
+				console.info(`File ${file} created`);
+			});
+		}
+		return pdf;
+	}
 }
 
 // Run book creation
@@ -152,6 +174,8 @@ class RecipesNotionHtmlToDoc {
 	let recipes = await converter.getRecipesDB();
 	recipes = await converter.addContentToRecipes(recipes, 10);
 
-	// Convert recipes to html
-	const recipesByType = await converter.getBook(recipes, args[0] ? args[0] : "recipes.html");
+	// Convert recipes to html then pdf
+	const doc = args[0] ? args[0] : "recipes"
+	await converter.getBook(recipes, `${doc}.html`);
+	await converter.printPDF(`file://${doc}.html`, `${doc}.pdf`);
 })();

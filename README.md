@@ -30,8 +30,8 @@ Minimal internationalisation is done: all Notion database attributes name are se
 ## Installation
 
 ```sh
-git clone https://github.com/seb-ma/RecipesNotionToPdf
-cd RecipesNotionToPdf
+git clone https://github.com/seb-ma/recipes-notion-to-pdf
+cd recipes-notion-to-pdf
 npm install
 ```
 
@@ -48,9 +48,12 @@ nano .env
 ```
 
 ## Usage
+
 ```sh
-npm run start /tmp/recipes.html
+npm run start /tmp/recipes
 ```
 
-Then, open the file in a browser, wait the end of [pagedjs](https://pagedjs.org/) processing (may take some minutes - check the end of document).
-Then, print the document.
+The PDF `/tmp/recipes.pdf` is then generated and ready to be printed.
+
+**Warning** Some CSS parts are not well managed by pagedjs with Chrome/Chromium (the process stop a first block in error).
+In this case, open html file in Firefox and generate PDF in browser.

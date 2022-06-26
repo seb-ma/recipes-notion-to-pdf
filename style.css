@@ -74,9 +74,8 @@ h1.section {
 
 .recipe-section img.cover {
 	margin: 1rem 0 1rem 0;
+	max-width: 100%;
 	object-fit: cover;
-	width: 100%;
-	/*opacity: 0.5;*/
 }
 
 article {
@@ -96,6 +95,10 @@ h1.recipe {
 	string-set: footerIndex content(text);
 }
 
+.presentation {
+	margin-top: 1rem;
+}
+
 .recipe img.cover {
 	height: 18vh;
 	width: 100%;
@@ -111,35 +114,31 @@ span.mdi {
 	margin-inline-end: 1rem;
 }
 
-.content {
+.recipe .content {
 	column-count: 2;
-	margin-block-start: 1rem;
+	margin-top: 1rem;
 }
 
-.content h2 {
+.recipe .content h2 {
 	background-color: #eee;
 	font-size: 1.25rem;
 	padding: 0.5rem;
 }
 
-.content h3 {
+.recipe .content h3 {
 	font-size: 1.1rem;
 }
 
-.content ol li {
+.recipe .content ol li {
 	padding: 0 0 0 .5em;
 }
 
-.content ol li::marker {
+.recipe .content ol li::marker {
 	font-family: "Rammetto One", cursive;
 }
 
 .index-section {
 	margin-block: 4rem;
-}
-
-.index-section ul {
-	/*columns: 2;*/
 }
 
 /* XXX: Doesn't work if on multiple pages */
