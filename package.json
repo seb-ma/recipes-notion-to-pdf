@@ -1,0 +1,23 @@
+{
+	"name": "recipes-notion-html2doc",
+	"version": "0.1",
+	"description": "Convert recipes stored in Notion to printable document.",
+	"main": "index.js",
+	"keywords": [
+		"recipes",
+		"notion"
+	],
+	"author": "Sébastien Mazzon",
+	"license": "MIT",
+	"scripts": {
+		"start": "node ./index.js"
+	},
+	"dependencies": {
+		"dotenv": "latest",
+		"handlebars": "latest",
+		"@notionhq/client": "latest",
+		"@notion-stuff/blocks-html-parser": "latest",
+		"marked": "latest",
+		"highlight.js": "latest"
+	}
+}

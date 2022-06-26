@@ -1,0 +1,217 @@
+/* CSS print */
+@media print {
+	@page {
+		size: A4;
+		margin: 10mm 10mm 20mm 10mm;
+
+		@bottom-center {
+			content: string(footerIndex);
+			opacity: 0.7;
+		}
+	}
+
+	.recipe-section {
+		break-after: always;
+		break-before: right;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		height: 100vh;
+		width: 100%;
+	}
+
+	article.recipe,
+	li {
+		break-inside: avoid;
+	}
+
+	h1+p,
+	h2+p,
+	h3+p,
+	h1+ol,
+	h2+ol,
+	h3+ol,
+	h1+ul,
+	h2+ul,
+	h3+ul {
+		break-before: avoid;
+	}
+
+	p,
+	li {
+		margin-block: 0.5rem;
+		orphans: 4;
+		widows: 5;
+	}
+
+	a:link {
+		color: black;
+	}
+
+	a:visited {
+		color: black;
+	}
+}
+
+/* global CSS */
+
+body,
+html {
+	font-family: "Fira Sans Condensed", sans-serif;
+}
+
+h1,
+h2,
+h3 {
+	font-family: "Rammetto One", cursive;
+}
+
+h1.section {
+	font-size: 6rem;
+	text-align: center;
+	string-set: footerIndex "";
+}
+
+.recipe-section img.cover {
+	margin: 1rem 0 1rem 0;
+	object-fit: cover;
+	width: 100%;
+	/*opacity: 0.5;*/
+}
+
+article {
+	margin-block-start: 3rem;
+}
+
+h1.recipe {
+	background: rgba(255, 255, 255, 0.5);
+	font-size: 2rem;
+	padding: 1rem;
+	position: absolute;
+	width: inherit;
+}
+
+.footerIndex {
+	display: none;
+	string-set: footerIndex content(text);
+}
+
+.recipe img.cover {
+	height: 18vh;
+	width: 100%;
+	object-fit: cover;
+	object-position: center 50%;
+}
+
+.properties {
+	font-size: 1.5rem;
+}
+
+span.mdi {
+	margin-inline-end: 1rem;
+}
+
+.content {
+	column-count: 2;
+	margin-block-start: 1rem;
+}
+
+.content h2 {
+	background-color: #eee;
+	font-size: 1.25rem;
+	padding: 0.5rem;
+}
+
+.content h3 {
+	font-size: 1.1rem;
+}
+
+.content ol li {
+	padding: 0 0 0 .5em;
+}
+
+.content ol li::marker {
+	font-family: "Rammetto One", cursive;
+}
+
+.index-section {
+	margin-block: 4rem;
+}
+
+.index-section ul {
+	/*columns: 2;*/
+}
+
+/* XXX: Doesn't work if on multiple pages */
+/*
+.index li::first-letter {
+	font-size: larger;
+	font-weight: bold;
+}
+*/
+
+.index-recipe {
+	font-size: 1.1rem;
+	margin: 0.4rem;
+}
+
+.index-tag {
+	border-radius: 0.5rem;
+	font-size: 0.85rem;
+	margin: 0.5rem;
+	padding: 0.3rem 0.6rem;
+	white-space: nowrap;
+}
+
+/* Tags colors */
+.tag-color-default {
+	background-color: hsl(0, 0%, 90%, 100%);
+	color: hsl(0, 0%, 10%, 100%);
+}
+
+.tag-color-gray {
+	background-color: hsl(0, 0%, 60%, 100%);
+	color: hsl(0, 0%, 10%, 100%);
+}
+
+.tag-color-brown {
+	background-color: hsl(45, 100%, 50%, 100%);
+	color: hsl(45, 100%, 10%, 100%);
+}
+
+.tag-color-orange {
+	background-color: hsl(20, 100%, 60%, 100%);
+	color: hsl(20, 100%, 10%, 100%);
+}
+
+.tag-color-yellow {
+	background-color: hsl(60, 100%, 48%, 100%);
+	color: hsl(60, 100%, 8%, 100%);
+}
+
+.tag-color-green {
+	background-color: hsl(120, 100%, 70%, 100%);
+	color: hsl(120, 100%, 10%, 100%);
+}
+
+.tag-color-blue {
+	background-color: hsl(200, 100%, 60%, 100%);
+	color: hsl(200, 100%, 10%, 100%);
+}
+
+.tag-color-purple {
+	background-color: hsl(280, 100%, 70%, 100%);
+	color: hsl(280, 100%, 10%, 100%);
+}
+
+.tag-color-pink {
+	background-color: hsl(320, 100%, 80%, 100%);
+	color: hsl(320, 100%, 10%, 100%);
+}
+
+.tag-color-red {
+	background-color: hsl(0, 100%, 60%, 100%);
+	color: hsl(0, 100%, 10%, 100%);
+}
+
+/* EO-Tags colors */
