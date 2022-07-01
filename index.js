@@ -35,7 +35,7 @@ class RecipesNotionHtmlToDoc {
 			handlebars.registerHelper("firstLetter", (str) => str.substring(0, 1));
 			handlebars.registerHelper("minutesToDuration", (mins) => `${mins < 60 ? "" : Math.trunc(mins / 60) + " h "}${(mins % 60) === 0 ? "" : ((mins < 60 ? "" : "0") + mins % 60).slice(-2) + " min"}`);
 			handlebars.registerHelper("hoursToDuration", (hrs) => `${hrs < 1 ? "" : Math.trunc(hrs) + " h "}${hrs - Math.trunc(hrs) === 0 ? "" : ((hrs < 1 ? "" : "0") + Math.trunc((hrs - Math.floor(hrs)) * 60)).slice(-2) + " min"}`);
-			handlebars.registerHelper("textToId", (txt) => txt.normalize("NFKD").replace(/\p{Diacritic}/gu, "").replace(/[^\w]/g, "_"));
+			handlebars.registerHelper("textToId", (str) => str.normalize("NFKD").replace(/\p{Diacritic}/gu, "").replace(/[^\w]/g, "_"));
 			console.info("Template loaded");
 		});
 
@@ -52,18 +52,14 @@ class RecipesNotionHtmlToDoc {
 	async getRecipesDB() {
 		const pages = [];
 		let cursor = undefined;
-
-		while (true) {
+		do {
 			const { results, next_cursor } = await this.notionConn.client.databases.query({
 				database_id: this.notionConn.dbId,
 				start_cursor: cursor,
 			});
 			pages.push(...results);
-			if (!next_cursor) {
-				break;
-			}
 			cursor = next_cursor;
-		}
+		} while (cursor);
 		console.info(`${pages.length} recipes successfully identified.`);
 		return pages.map(page => {
 			const title = page.properties[process.env.NOTION_DB_NAME].title
