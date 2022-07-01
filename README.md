@@ -1,6 +1,6 @@
 # recipes-notion-to-pdf
 
-This script permits to generate a HTML document that can be easily printed as a clean recipes book from recipes stored in a Notion database.
+This script permits to generate a PDF document that can be easily printed as a clean recipes book from recipes stored in a Notion database.
 It generates:
 - a book title (with an illustration)
 - an index of all recipes in each section (with colored labels)
@@ -54,6 +54,7 @@ npm run start /tmp/recipes
 ```
 
 The PDF `/tmp/recipes.pdf` is then generated and ready to be printed.
+NB: There is also a `.html` file in the same folder.
 
-**Warning** Some CSS parts are not well managed by pagedjs with Chrome/Chromium (the process stop on first block in error).
-In this case, open html file in Firefox and generate PDF in browser.
+**Warning** Some CSS parts are not well managed by pagedjs with Chrome/Chromium (the process stops on first block in error).
+In this case, open the `html` file in Firefox and generate PDF in browser.

@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 const fs = require("node:fs");
 const path = require("path");
 const handlebars = require("handlebars");
-const puppeteer = require("puppeteer-core")
+const puppeteer = require("puppeteer-core");
 const { NotionBlocksHtmlParser } = require("@notion-stuff/blocks-html-parser");
 
 class RecipesNotionHtmlToDoc {
@@ -32,9 +32,9 @@ class RecipesNotionHtmlToDoc {
 			}
 			this.templateBook = handlebars.compile(data.toString());
 			// Register helpers
-			handlebars.registerHelper('firstLetter', (str) => str.substring(0, 1));
-			handlebars.registerHelper('minutesToDuration', (mins) => `${mins < 60 ? "" : Math.trunc(mins / 60) + " h "}${(mins % 60) === 0 ? "" : ((mins < 60 ? "" : "0") + mins % 60).slice(-2) + " min"}`);
-			handlebars.registerHelper('hoursToDuration', (hrs) => `${hrs < 1 ? "" : Math.trunc(hrs) + " h "}${hrs - Math.trunc(hrs) === 0 ? "" : ((hrs < 1 ? "" : "0") + Math.trunc((hrs - Math.floor(hrs)) * 60)).slice(-2) + " min"}`);
+			handlebars.registerHelper("firstLetter", (str) => str.substring(0, 1));
+			handlebars.registerHelper("minutesToDuration", (mins) => `${mins < 60 ? "" : Math.trunc(mins / 60) + " h "}${(mins % 60) === 0 ? "" : ((mins < 60 ? "" : "0") + mins % 60).slice(-2) + " min"}`);
+			handlebars.registerHelper("hoursToDuration", (hrs) => `${hrs < 1 ? "" : Math.trunc(hrs) + " h "}${hrs - Math.trunc(hrs) === 0 ? "" : ((hrs < 1 ? "" : "0") + Math.trunc((hrs - Math.floor(hrs)) * 60)).slice(-2) + " min"}`);
 			console.info("Template loaded");
 		});
 
@@ -49,19 +49,19 @@ class RecipesNotionHtmlToDoc {
 	}
 
 	async getRecipesDB() {
-		const pages = []
-		let cursor = undefined
+		const pages = [];
+		let cursor = undefined;
 
 		while (true) {
 			const { results, next_cursor } = await this.notionConn.client.databases.query({
 				database_id: this.notionConn.dbId,
 				start_cursor: cursor,
-			})
-			pages.push(...results)
+			});
+			pages.push(...results);
 			if (!next_cursor) {
-				break
+				break;
 			}
-			cursor = next_cursor
+			cursor = next_cursor;
 		}
 		console.info(`${pages.length} recipes successfully identified.`);
 		return pages.map(page => {
@@ -146,12 +146,12 @@ class RecipesNotionHtmlToDoc {
 		const browser = await puppeteer.launch({ headless: true, executablePath: "chromium" });
 		const page = await browser.newPage();
 		console.info(`Open ${doc} in browser`);
-		await page.goto(doc, { waitUntil: 'networkidle0' });
-		console.info(`Wait full rendering`);
+		await page.goto(doc, { waitUntil: "networkidle0" });
+		console.info("Wait full rendering");
 		await page.waitForFunction("window.fullRender === true", { timeout: 5 * 60 * 1000 });
 
-		console.info(`Generate pdf`);
-		const pdf = await page.pdf({ format: 'A4' });
+		console.info("Generate pdf");
+		const pdf = await page.pdf({ format: "A4" });
 		await browser.close();
 		if (file) {
 			fs.writeFile(file, pdf, function (error) {
