@@ -45,11 +45,19 @@
 	}
 
 	a:link {
-		color: black;
+		color: inherit;
 	}
 
 	a:visited {
-		color: black;
+		color: inherit;
+	}
+
+	.index a:link {
+		text-decoration: inherit;
+	}
+
+	.index a:visited {
+		text-decoration: inherit;
 	}
 }
 
