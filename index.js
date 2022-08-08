@@ -11,13 +11,22 @@ const { NotionBlocksHtmlParser } = require("@notion-stuff/blocks-html-parser");
 class RecipesNotionHtmlToDoc {
 
 	notionConn = { client: "", dbId: "" };
+	semaphoreCount = undefined;
+
 	notionBlocksHtmlParser = undefined;
 	templateBook = undefined;
 	css = undefined;
 
-	constructor() {
+	async init(semaphoreCount = 3) {
+		this.semaphoreCount = semaphoreCount;
 		// Get Environment variables
-		dotenv.config({ path: `${__dirname}/.env` });
+		const pathEnv = `${__dirname}/.env`;
+		try {
+			fs.accessSync(pathEnv);
+		} catch (error) {
+			throw new Error("You must copy .env.sample to .env and changes values");
+		}
+		dotenv.config({ path: pathEnv });
 
 		// Initialize Notion API
 		this.notionConn = { client: new Client({ auth: process.env.NOTION_KEY }), dbId: process.env.NOTION_DATABASE_ID };
@@ -49,6 +58,53 @@ class RecipesNotionHtmlToDoc {
 		});
 	}
 
+	getPropertyValueFromType(property) {
+		if (property?.type) {
+			if (property.type === "title") {
+				return property?.title?.plain_text;
+			} else if (property.type === "select") {
+				return property.select?.name;
+			} else if (property.type === "multi_select") {
+				return property?.multi_select.flatMap(opt => { return { name: opt?.name, color: opt?.color }; }).sort((a, b) => a.name.localeCompare(b.name));
+			} else if (property.type === "number") {
+				return property?.number;
+			} else if (property.type === "url") {
+				return property?.url;
+			}
+			console.error(property);
+			throw new Error("Type not handled - to be implemented");
+		} else {
+			return property;
+		}
+	}
+
+	async getPropertyValue(page, property) {
+		const propertyId = page.properties[property].id;
+		const propertyItem = await this.notionConn.client.pages.properties.retrieve({
+			page_id: page.id,
+			property_id: propertyId,
+		});
+
+		if (propertyItem.object === "property_item") {
+			return this.getPropertyValueFromType(propertyItem);
+		}
+
+		// Property is paginated.
+		let nextCursor = propertyItem.next_cursor;
+		const results = propertyItem.results;
+
+		while (nextCursor !== null) {
+			const propertyItem = await this.notionConn.client.pages.properties.retrieve({
+				page_id: page.id,
+				property_id: propertyId,
+				start_cursor: nextCursor,
+			});
+			nextCursor = propertyItem.next_cursor;
+			results.push(...propertyItem.results);
+		}
+		return results.map(property => this.getPropertyValueFromType(property));
+	}
+
 	async getRecipesDB() {
 		const pages = [];
 		let cursor = undefined;
@@ -61,46 +117,48 @@ class RecipesNotionHtmlToDoc {
 			cursor = next_cursor;
 		} while (cursor);
 		console.info(`${pages.length} recipes successfully identified.`);
-		return pages.map(page => {
-			const title = page.properties[process.env.NOTION_DB_NAME].title
-				.map(({ plain_text }) => plain_text)
-				.join("");
+		return await this.parallel(pages, async page => {
+			const title = (await this.getPropertyValue(page, process.env.NOTION_DB_NAME)).map(plain_text => plain_text).join("");
+			console.log("Get recipe meta for", title);
 			return {
 				pageId: page.id,
 				title: title,
-				cover: page.cover?.external?.url,
-				type: page.properties[process.env.NOTION_DB_TYPE]?.select?.name,
-				tags: page.properties[process.env.NOTION_DB_TAGS]?.multi_select.flatMap(opt => { return { name: opt?.name, color: opt?.color }; }).sort((a, b) => a.name.localeCompare(b.name)),
-				numberPersons: page.properties[process.env.NOTION_DB_NB_PERSONS]?.number,
-				preparationDuration: page.properties[process.env.NOTION_DB_PREPA_DURATION]?.number,
-				cookDuration: page.properties[process.env.NOTION_DB_COOK_DURATION]?.number,
-				restDuration: page.properties[process.env.NOTION_DB_REST_DURATION]?.number,
-				temperature: page.properties[process.env.NOTION_DB_TEMPERATURE]?.number,
-				url: page.properties[process.env.NOTION_DB_RECIPE_URL]?.url,
+				cover: await page.cover?.external?.url,
+				type: await this.getPropertyValue(page, process.env.NOTION_DB_TYPE),
+				tags: await this.getPropertyValue(page, process.env.NOTION_DB_TAGS),
+				numberPersons: await this.getPropertyValue(page, process.env.NOTION_DB_NB_PERSONS),
+				preparationDuration: await this.getPropertyValue(page, process.env.NOTION_DB_PREPA_DURATION),
+				cookDuration: await this.getPropertyValue(page, process.env.NOTION_DB_COOK_DURATION),
+				restDuration: await this.getPropertyValue(page, process.env.NOTION_DB_REST_DURATION),
+				temperature: await this.getPropertyValue(page, process.env.NOTION_DB_TEMPERATURE),
+				url: await this.getPropertyValue(page, process.env.NOTION_DB_RECIPE_URL),
 			}
-		})
+		});
 	}
 
-	async addContentToRecipe(recipe) {
-		console.log(`Get content for ${recipe.title}`);
-		const response = await this.notionConn.client.blocks.children.list({ block_id: recipe.pageId });
-		recipe.htmlContent = this.notionBlocksHtmlParser.parse(response.results);
-		return recipe;
+	async addContentToRecipes(recipes) {
+		return await this.parallel(recipes, async recipe => {
+			console.log(`Get recipe content for ${recipe.title}`);
+			const response = await this.notionConn.client.blocks.children.list({ block_id: recipe.pageId });
+			recipe.htmlContent = this.notionBlocksHtmlParser.parse(response.results);
+			return recipe;
+		});
 	}
 
-	async addContentToRecipes(recipes, semaphoreCount = 5) {
-		const recipesWithContent = [];
-		if (semaphoreCount > 1) {
-			while (recipes.length) {
-				recipesWithContent.push(...await Promise.all(recipes.splice(0, semaphoreCount).map(recipe => this.addContentToRecipe(recipe))));
+	async parallel(items, callbackItem) {
+		const result = [];
+		if (this.semaphoreCount > 1) {
+			// Simple implementation of a semaphore. Drawback: wait the last of a batch before loading a new batch
+			while (items.length) {
+				result.push(...await Promise.all(items.splice(0, this.semaphoreCount).map(item => callbackItem(item))));
 			}
 		} else {
-			for (let recipe of recipes) {
-				recipesWithContent.push(await this.addContentToRecipe(recipe));
+			for (let item of items) {
+				result.push(await callbackItem(item));
 			}
 		}
 
-		return recipesWithContent;
+		return result;
 	}
 
 	getBook(recipes, file) {
@@ -166,14 +224,19 @@ class RecipesNotionHtmlToDoc {
 (async () => {
 	const args = process.argv.slice(2);
 
-	const converter = new RecipesNotionHtmlToDoc();
+	try {
+		const converter = new RecipesNotionHtmlToDoc()
+		await converter.init(6);
 
-	// Retrieve recipes
-	let recipes = await converter.getRecipesDB();
-	recipes = await converter.addContentToRecipes(recipes, 10);
+		// Retrieve recipes
+		let recipes = await converter.getRecipesDB();
+		recipes = await converter.addContentToRecipes(recipes);
 
-	// Convert recipes to html then pdf
-	const doc = path.resolve(process.cwd(), args[0] ? args[0] : "./recipes");
-	await converter.getBook(recipes, `${doc}.html`);
-	await converter.printPDF(`file://${doc}.html`, `${doc}.pdf`);
+		// Convert recipes to html then pdf
+		const doc = path.resolve(process.cwd(), args[0] ? args[0] : "./recipes");
+		await converter.getBook(recipes, `${doc}.html`);
+		await converter.printPDF(`file://${doc}.html`, `${doc}.pdf`);
+	} catch (error) {
+		console.error(error, error);
+	}
 })();
