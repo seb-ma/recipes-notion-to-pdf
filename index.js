@@ -12,13 +12,15 @@ class RecipesNotionHtmlToDoc {
 
 	notionConn = { client: "", dbId: "" };
 	semaphoreCount = undefined;
+	browserPath = undefined;
 
 	notionBlocksHtmlParser = undefined;
 	templateBook = undefined;
 	css = undefined;
 
-	async init(semaphoreCount = 3) {
+	async init({semaphoreCount = 3, browserPath = "firefox"}) {
 		this.semaphoreCount = semaphoreCount;
+		this.browserPath = browserPath;
 		// Get Environment variables
 		const pathEnv = `${__dirname}/.env`;
 		try {
@@ -181,7 +183,7 @@ class RecipesNotionHtmlToDoc {
 			cover: `${__dirname}/img/cover.svg`,
 			sections: sections,
 			// Functions for handlebars template
-			cssBook: () => `<style>${this.css}</style>`,
+			cssBook: () => this.css,
 		}
 
 		// Rendering book
@@ -198,12 +200,26 @@ class RecipesNotionHtmlToDoc {
 	}
 
 	async printPDF(doc, file) {
-		const browser = await puppeteer.launch({ headless: true, executablePath: "chromium" });
-		const page = await browser.newPage();
-		console.info(`Open ${doc} in browser`);
-		await page.goto(doc, { waitUntil: "networkidle0" });
-		console.info("Wait full rendering");
-		await page.waitForFunction("window.fullRender === true", { timeout: 5 * 60 * 1000 });
+		let browser = undefined;
+		let page = undefined;
+		if (this.browserPath.includes("firefox")) {
+			browser = await puppeteer.launch({ headless: true, product: "firefox", executablePath: this.browserPath });
+			page = await browser.newPage();
+			console.info(`Open ${doc} in browser`);
+			try {
+				await page.goto(doc, { waitUntil: ["networkidle0", "load", "domcontentloaded"], timeout: 60000 });
+			} catch (error) {
+				// With Firefox: goto throw timeout with local files: see https://github.com/puppeteer/puppeteer/issues/5504
+				// so ignore it and cross fingers to have full loaded page
+			}
+		} else {
+			browser = await puppeteer.launch({ headless: true, executablePath: this.browserPath });
+			page = await browser.newPage();
+			console.info(`Open ${doc} in browser`);
+			await page.goto(doc, { waitUntil: "networkidle0" });
+			console.info("Wait full rendering");
+			await page.waitForFunction("window.fullRender === true", { timeout: 5 * 60 * 1000 });
+		}
 
 		console.info("Generate pdf");
 		const pdf = await page.pdf({ format: "A4" });
@@ -226,7 +242,7 @@ class RecipesNotionHtmlToDoc {
 
 	try {
 		const converter = new RecipesNotionHtmlToDoc()
-		await converter.init(6);
+		await converter.init({semaphoreCount: 6});
 
 		// Retrieve recipes
 		let recipes = await converter.getRecipesDB();

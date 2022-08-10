@@ -66,12 +66,14 @@
 body,
 html {
 	font-family: "Fira Sans Condensed", sans-serif;
+	font-size: 14px;
 }
 
 h1,
 h2,
 h3 {
 	font-family: "Rammetto One", cursive;
+	margin-block: 0;
 }
 
 h1.section {
@@ -93,6 +95,7 @@ article {
 h1.recipe {
 	background: rgba(255, 255, 255, 0.5);
 	font-size: 2rem;
+	line-height: 2.5rem;
 	padding: 1rem;
 	position: absolute;
 	width: inherit;
@@ -104,7 +107,10 @@ h1.recipe {
 }
 
 .presentation {
-	margin-bottom: 1rem;
+	align-items: stretch;
+	display: flex;
+	flex-wrap: wrap;
+	margin-block-end: 1rem;
 }
 
 .recipe img.cover {
@@ -114,12 +120,23 @@ h1.recipe {
 	object-position: center 50%;
 }
 
+.title {
+	flex: none;
+	width: calc(75% - 1rem);
+}
+
 .properties {
 	font-size: 1.5rem;
+	margin-inline-start: 1rem;
+}
+
+.properties > * {
+	margin-block: 0.25rem;
 }
 
 span.mdi {
 	margin-inline-end: 1rem;
+	width: 1ch;
 }
 
 .recipe .content {
@@ -136,8 +153,16 @@ span.mdi {
 	font-size: 1.1rem;
 }
 
-.recipe .content ol li {
-	padding: 0 0 0 .5em;
+.recipe .content ol li,
+.recipe .content ul li {
+		padding: 0 0 0 .5em;
+}
+
+.recipe .content ol,
+.recipe .content ul {
+	margin-block-start: 0;
+	margin-inline: 2rem;
+	padding: 0;
 }
 
 .recipe .content ol li::marker {
@@ -146,6 +171,10 @@ span.mdi {
 
 .index-section {
 	margin-block: 4rem;
+}
+
+.index li {
+	margin-block: 0.8rem;
 }
 
 /* XXX: Doesn't work if on multiple pages */
@@ -219,5 +248,4 @@ span.mdi {
 	background-color: hsl(0, 100%, 60%, 100%);
 	color: hsl(0, 100%, 10%, 100%);
 }
-
 /* EO-Tags colors */

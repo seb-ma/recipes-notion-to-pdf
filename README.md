@@ -56,5 +56,6 @@ npm run start /tmp/recipes
 The PDF `/tmp/recipes.pdf` is then generated and ready to be printed.
 NB: There is also a `.html` file in the same folder.
 
-**Warning** Some CSS parts are not well managed by pagedjs with Chrome/Chromium (the process stops on first block in error).
-In this case, open the `html` file in Firefox and generate PDF in browser.
+**Warning** Some CSS attributes are not well managed by Chrome/Chromium with pagedjs (`column-count`) and PDF render is inaccurate.
+
+So, by default, PDF is generated with Firefox (currently with the drawback induced by issue [Firefox: puppeteer never returns from page.goto() with file:// protocol](https://github.com/puppeteer/puppeteer/issues/5504)).

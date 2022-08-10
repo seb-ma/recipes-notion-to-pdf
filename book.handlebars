@@ -14,7 +14,6 @@
 
 	<!-- CSS libraries -->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" />
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css" />
 
 	<!-- paged.js library (css media print) -->
 	<script src="https://cdn.jsdelivr.net/npm/pagedjs/dist/paged.polyfill.js"></script>
@@ -22,7 +21,9 @@
 	<title>{{title}}</title>
 
 	<!-- CSS from style.css -->
+	<style>
 	{{&cssBook}}
+	</style>
 
 	<script>
 		// Checked by Puppeteer
@@ -78,48 +79,48 @@
 		</div>
 		{{#recipes}}
 		<article class="recipe" id="{{textToId title}}">
-			<div class="presentation row align-items-start align-items-stretch">
-				<div class="title col-9">
+			<div class="presentation">
+				<div class="title">
 					<h1 class="recipe">{{title}}</h1>
 					<img class="cover" src="{{cover}}" />
 					<!-- Only needed for footer in page CSS -->
 					<div class="footerIndex">[{{../title}}] {{firstLetter title}}</div>
 				</div>
-				<div class="properties col-3">
+				<div class="properties">
 					{{#tags}}
 					<div class="tags">
-						<span class="mdi mdi-tag-multiple-outline col-1"></span>
-						<span class="value col-2">{{name}}</span>
+						<span class="mdi mdi-tag-multiple-outline"></span>
+						<span class="value">{{name}}</span>
 					</div>
 					{{/tags}}
 					{{#numberPersons}}
 					<div class="numberPersons">
-						<span class="mdi mdi-account-group-outline col-1"></span>
-						<span class="value col-2">{{.}}</span>
+						<span class="mdi mdi-account-group-outline"></span>
+						<span class="value">{{.}}</span>
 					</div>
 					{{/numberPersons}}
 					{{#preparationDuration}}
 					<div class="preparationDuration">
-						<span class="mdi mdi-timer-outline col-1"></span>
-						<span class="value col-2">{{minutesToDuration .}}</span>
+						<span class="mdi mdi-timer-outline"></span>
+						<span class="value">{{minutesToDuration .}}</span>
 					</div>
 					{{/preparationDuration}}
 					{{#restDuration}}
 					<div class="restDuration">
-						<span class="mdi mdi-motion-pause-outline col-1"></span>
-						<span class="value col-2">{{hoursToDuration .}}</span>
+						<span class="mdi mdi-motion-pause-outline"></span>
+						<span class="value">{{hoursToDuration .}}</span>
 					</div>
 					{{/restDuration}}
 					{{#temperature}}
 					<div class="temperature">
-						<span class="mdi mdi-thermometer col-1"></span>
-						<span class="value col-2">{{.}} °C</span>
+						<span class="mdi mdi-thermometer"></span>
+						<span class="value">{{.}} °C</span>
 					</div>
 					{{/temperature}}
 					{{#cookDuration}}
 					<div class="cookDuration">
-						<span class="mdi mdi-fire col-1"></span>
-						<span class="value col-2">{{minutesToDuration .}}</span>
+						<span class="mdi mdi-fire"></span>
+						<span class="value">{{minutesToDuration .}}</span>
 					</div>
 					{{/cookDuration}}
 				</div>
